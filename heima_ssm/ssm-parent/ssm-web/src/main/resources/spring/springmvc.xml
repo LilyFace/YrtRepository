@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			    http://www.springframework.org/schema/beans/spring-beans.xsd
+			    http://www.springframework.org/schema/context
+			    http://www.springframework.org/schema/context/spring-context.xsd
+			    http://www.springframework.org/schema/mvc
+			    http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--开启注解扫描-->
+    <!--扫描表现层-->
+    <context:component-scan base-package="com.itheima.controller"/>
+    <!--处理器映射器，处理器适配器-->
+    <mvc:annotation-driven/>
+    <!--视图解析器-->
+    <bean id="resourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- JSP文件所在的目录 -->
+        <property name="prefix" value="/pages/" />
+        <!-- 文件的后缀名 -->
+        <property name="suffix" value=".jsp" />
+    </bean>
+    <!--放行静态资源-->
+    <mvc:default-servlet-handler/>
+
+    <!--配置转换器工厂-->
+    <bean id="conversionServiceFactoryBean" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <!--注入自定义转换器-->
+        <property name="converters">
+            <array>
+                <bean id="stringToDateConverter" class="com.itheima.converter.StringToDateConverter"/>
+            </array>
+        </property>
+    </bean>
+
+    <!--注解支持,引用自定义转换器-->
+    <mvc:annotation-driven conversion-service="conversionServiceFactoryBean"/>
+
+    <!--
+       支持AOP的注解支持，AOP底层使用代理技术
+       JDK动态代理，要求必须有接口
+       cglib代理，生成子类对象，proxy-target-class="true" 默认使用cglib的方式
+       开启对于AOP的支持(主要用于权限控制注解生效)
+   -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+</beans>
